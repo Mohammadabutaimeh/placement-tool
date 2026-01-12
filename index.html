@@ -76,9 +76,10 @@ function submitResult() {
   const studentId = document.getElementById("studentId").value.trim();
   const score = Number(document.getElementById("score").value);
   const degree = document.getElementById("degree").value;
+  const statusEl = document.getElementById("status");
 
   if (!studentId || isNaN(score) || score < 0 || score > 100) {
-    document.getElementById("status").innerText = "❌ الرجاء إدخال بيانات صحيحة";
+    statusEl.innerText = "❌ الرجاء إدخال بيانات صحيحة";
     return;
   }
 
@@ -94,19 +95,24 @@ function submitResult() {
     ExemptedSubjects: exempted
   };
 
+  statusEl.innerText = "⏳ جاري الحفظ...";
+
   fetch("https://defaulta162c5327a0c464596fd20d019cf4e.5a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e92b89f4895c4f1591d02e0fc2a7e609/triggers/manual/paths/invoke?api-version=1", {
     method: "POST",
     mode: "cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return res.json();
+  })
   .then(() => {
-    document.getElementById("status").innerText = "✅ تم حفظ النتيجة في SharePoint";
+    statusEl.innerText = "✅ تم حفظ النتيجة في SharePoint";
   })
   .catch(err => {
     console.error(err);
-    document.getElementById("status").innerText = "❌ خطأ أثناء الإرسال";
+    statusEl.innerText = "❌ خطأ أثناء الإرسال – تحقق من Flow و Response Step";
   });
 }
 </script>
