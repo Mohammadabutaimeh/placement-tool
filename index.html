@@ -97,26 +97,25 @@ function submitResult() {
 
   statusEl.innerText = "⏳ جاري الحفظ...";
 
-  fetch("https://defaulta162c5327a0c464596fd20d019cf4e.5a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e92b89f4895c4f1591d02e0fc2a7e609/triggers/manual/paths/invoke?api-version=1", {
+  fetch("https://script.google.com/macros/s/AKfycbx6__Nq3JkAjlB6CXIyqZpCNWJuIF_Qs1zmVmOOJTMA3wTu5uJL5pK8YiY6gnxUkb51pg/exec", {
     method: "POST",
-    mode: "cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
-  .then(res => {
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    return res.json();
-  })
-  .then(() => {
-    statusEl.innerText = "✅ تم حفظ النتيجة في SharePoint";
+  .then(res => res.json())
+  .then(resData => {
+    if(resData.status === "success") {
+      statusEl.innerText = "✅ تم حفظ النتيجة في Google Sheet";
+    } else {
+      statusEl.innerText = "❌ خطأ أثناء الحفظ: " + resData.message;
+    }
   })
   .catch(err => {
     console.error(err);
-    statusEl.innerText = "❌ خطأ أثناء الإرسال – تحقق من Flow و Response Step";
+    statusEl.innerText = "❌ خطأ أثناء الاتصال بالـ Google Sheet";
   });
 }
 </script>
 
 </body>
 </html>
-
