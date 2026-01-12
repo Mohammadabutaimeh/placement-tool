@@ -28,6 +28,7 @@
 <p id="status"></p>
 
 <script>
+// مستويات كل درجة
 const levels = {
   "Associate Degree": [
     { min: 0, max: 25, name: "Beginner", code: "BEG-A1" },
@@ -76,6 +77,16 @@ const levels = {
   ]
 };
 
+// تحويل النص إلى Choice value (Integer) لكل Degree
+const degreeChoiceValues = {
+  "Associate Degree": 100000000,
+  "Higher National Certificate Level 4": 100000001,
+  "Higher National Diploma Level 5": 100000002,
+  "Vocational Diploma": 100000003,
+  "Bachelor Degree": 100000004
+};
+
+// حساب المستوى من العلامة
 function getLevel(score, degree) {
   const arr = levels[degree] || [];
   for (let i = 0; i < arr.length; i++) {
@@ -84,6 +95,7 @@ function getLevel(score, degree) {
   return { name: "", code: "" };
 }
 
+// المواد المعفاة
 function getExemptedSubjects(score, degree) {
   const arr = levels[degree] || [];
   return arr
@@ -92,10 +104,12 @@ function getExemptedSubjects(score, degree) {
     .join(", ");
 }
 
+// إرسال البيانات
 function submitResult() {
   const studentId = document.getElementById("studentId").value.trim();
   const score = Number(document.getElementById("score").value);
-  const degree = document.getElementById("degree").value;
+  const degreeLabel = document.getElementById("degree").value;
+  const degreeValue = degreeChoiceValues[degreeLabel]; // الرقم الصحيح للChoice
   const statusEl = document.getElementById("status");
 
   if (!studentId || isNaN(score) || score < 0 || score > 100) {
@@ -103,13 +117,13 @@ function submitResult() {
     return;
   }
 
-  const level = getLevel(score, degree);
-  const exempted = getExemptedSubjects(score, degree);
+  const level = getLevel(score, degreeLabel);
+  const exempted = getExemptedSubjects(score, degreeLabel);
 
   const data = {
     StudentID: studentId,
     Score: score,
-    Degree: degree,
+    Degree: degreeValue,       // <-- الرقم
     LevelName: level.name,
     LevelCode: level.code,
     ExemptedSubjects: exempted
@@ -124,7 +138,7 @@ function submitResult() {
   })
   .then(res => {
     if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    statusEl.innerText = "✅ تم حفظ النتيجة في Dataverse";
+    statusEl.innerText = `✅ تم حفظ النتيجة في Dataverse\nرقم الطالب: ${studentId}\nالعلامة: ${score}\nالدرجة العلمية: ${degreeLabel}\nالمستوى: ${level.name} (${level.code})\nالمواد المعفاة: ${exempted}`;
   })
   .catch(err => {
     console.error(err);
@@ -135,4 +149,3 @@ function submitResult() {
 
 </body>
 </html>
-
