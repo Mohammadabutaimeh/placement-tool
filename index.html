@@ -17,9 +17,7 @@
 <label>الدرجة العلمية</label><br>
 <select id="degree">
   <option>Associate Degree</option>
-  <option>Higher National Certificate Level 4</option>
-  <option>Higher National Diploma Level 5</option>
-  <option>Vocational Diploma</option>
+  <option>Luminus BTEC Level 4 + 5</option>
   <option>Bachelor Degree</option>
 </select><br><br>
 
@@ -99,9 +97,7 @@ function submitResult() {
   fetch("https://defaulta162c5327a0c464596fd20d019cf4e.5a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e92b89f4895c4f1591d02e0fc2a7e609/triggers/manual/paths/invoke?api-version=1", {
     method: "POST",
     mode: "cors",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
   .then(res => res.json())
