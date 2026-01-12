@@ -9,15 +9,17 @@
 <h2>Placement Test Tool</h2>
 
 <label>رقم الطالب</label><br>
-<input id="studentId"><br><br>
+<input id="studentId" required><br><br>
 
 <label>العلامة</label><br>
-<input id="score" type="number" min="0" max="100"><br><br>
+<input id="score" type="number" min="0" max="100" required><br><br>
 
 <label>الدرجة العلمية</label><br>
 <select id="degree">
   <option>Associate Degree</option>
-  <option>Luminus BTEC Level 4 + 5</option>
+  <option>Higher National Certificate Level 4</option>
+  <option>Higher National Diploma Level 5</option>
+  <option>Vocational Diploma</option>
   <option>Bachelor Degree</option>
 </select><br><br>
 
@@ -27,15 +29,6 @@
 
 <script>
 const levels = {
-  "Luminus BTEC Level 4 + 5": [
-    { min: 0, max: 25, name: "Foundation", code: "Pre-A1-ID" },
-    { min: 26, max: 39, name: "Elementary", code: "A1-ID" },
-    { min: 40, max: 54, name: "Pre-Intermediate", code: "A2-ID" },
-    { min: 55, max: 69, name: "Intermediate", code: "B1-ID" },
-    { min: 70, max: 79, name: "Upper Intermediate", code: "B2-ID" },
-    { min: 80, max: 89, name: "Advanced", code: "C1-ID" },
-    { min: 90, max: 100, name: "Proficiency", code: "C2-ID" }
-  ],
   "Associate Degree": [
     { min: 0, max: 25, name: "Beginner", code: "BEG-A1" },
     { min: 26, max: 39, name: "Elementary", code: "EL-IA2" },
@@ -44,6 +37,33 @@ const levels = {
     { min: 70, max: 79, name: "Upper Intermediate", code: "B2-AD" },
     { min: 80, max: 89, name: "Advanced", code: "C1-AD" },
     { min: 90, max: 100, name: "Proficiency", code: "C2-AD" }
+  ],
+  "Higher National Certificate Level 4": [
+    { min: 0, max: 25, name: "Beginner", code: "HNC-0" },
+    { min: 26, max: 39, name: "Elementary", code: "HNC-1" },
+    { min: 40, max: 54, name: "Pre-Intermediate", code: "HNC-2" },
+    { min: 55, max: 69, name: "Intermediate", code: "HNC-3" },
+    { min: 70, max: 79, name: "Upper Intermediate", code: "HNC-4" },
+    { min: 80, max: 89, name: "Advanced", code: "HNC-5" },
+    { min: 90, max: 100, name: "Proficiency", code: "HNC-6" }
+  ],
+  "Higher National Diploma Level 5": [
+    { min: 0, max: 25, name: "Beginner", code: "HND-0" },
+    { min: 26, max: 39, name: "Elementary", code: "HND-1" },
+    { min: 40, max: 54, name: "Pre-Intermediate", code: "HND-2" },
+    { min: 55, max: 69, name: "Intermediate", code: "HND-3" },
+    { min: 70, max: 79, name: "Upper Intermediate", code: "HND-4" },
+    { min: 80, max: 89, name: "Advanced", code: "HND-5" },
+    { min: 90, max: 100, name: "Proficiency", code: "HND-6" }
+  ],
+  "Vocational Diploma": [
+    { min: 0, max: 25, name: "Beginner", code: "VOC-0" },
+    { min: 26, max: 39, name: "Elementary", code: "VOC-1" },
+    { min: 40, max: 54, name: "Pre-Intermediate", code: "VOC-2" },
+    { min: 55, max: 69, name: "Intermediate", code: "VOC-3" },
+    { min: 70, max: 79, name: "Upper Intermediate", code: "VOC-4" },
+    { min: 80, max: 89, name: "Advanced", code: "VOC-5" },
+    { min: 90, max: 100, name: "Proficiency", code: "VOC-6" }
   ],
   "Bachelor Degree": [
     { min: 0, max: 25, name: "English 99", code: "BA-ENG99" },
@@ -97,26 +117,21 @@ function submitResult() {
 
   statusEl.innerText = "⏳ جاري الحفظ...";
 
-  fetch("https://script.google.com/macros/s/AKfycbx6__Nq3JkAjlB6CXIyqZpCNWJuIF_Qs1zmVmOOJTMA3wTu5uJL5pK8YiY6gnxUkb51pg/exec", {
+  fetch("https://60f3411127c0ea4eb2e044759845b2.42.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4a39041f81d5458aaa8b63c3f3cf53c7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=1r1D14EpiWwCbmoYQPWYWf_7f5Pak_SM_9SQ2CNoA64", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
-  .then(res => res.json())
-  .then(resData => {
-    if(resData.status === "success") {
-      statusEl.innerText = "✅ تم حفظ النتيجة في Google Sheet";
-    } else {
-      statusEl.innerText = "❌ خطأ أثناء الحفظ: " + resData.message;
-    }
+  .then(res => {
+    if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    statusEl.innerText = "✅ تم حفظ النتيجة في Dataverse";
   })
   .catch(err => {
     console.error(err);
-    statusEl.innerText = "❌ خطأ أثناء الاتصال بالـ Google Sheet";
+    statusEl.innerText = "❌ خطأ أثناء الاتصال بالـ Dataverse";
   });
 }
 </script>
 
 </body>
 </html>
-
