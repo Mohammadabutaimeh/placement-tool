@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>Placement Test</title>
+  <title>Placement Test Tool</title>
 </head>
 <body>
 
@@ -28,41 +28,88 @@
 <p id="status"></p>
 
 <script>
-function submitResult() {
+const levels = {
+  "Luminus BTEC Level 4 + 5": [
+    { min: 0, max: 25, name: "Foundation", code: "Pre-A1-ID" },
+    { min: 26, max: 39, name: "Elementary", code: "A1-ID" },
+    { min: 40, max: 54, name: "Pre-Intermediate", code: "A2-ID" },
+    { min: 55, max: 69, name: "Intermediate", code: "B1-ID" },
+    { min: 70, max: 79, name: "Upper Intermediate", code: "B2-ID" },
+    { min: 80, max: 89, name: "Advanced", code: "C1-ID" },
+    { min: 90, max: 100, name: "Proficiency", code: "C2-ID" }
+  ],
+  "Associate Degree": [
+    { min: 0, max: 25, name: "Beginner", code: "BEG-A1" },
+    { min: 26, max: 39, name: "Elementary", code: "EL-IA2" },
+    { min: 40, max: 54, name: "Pre-Intermediate", code: "PRE-B1" },
+    { min: 55, max: 69, name: "Intermediate", code: "INT-B2" },
+    { min: 70, max: 79, name: "Upper Intermediate", code: "B2-AD" },
+    { min: 80, max: 89, name: "Advanced", code: "C1-AD" },
+    { min: 90, max: 100, name: "Proficiency", code: "C2-AD" }
+  ],
+  "Bachelor Degree": [
+    { min: 0, max: 25, name: "English 99", code: "BA-ENG99" },
+    { min: 26, max: 39, name: "Elementary", code: "BA-3EL" },
+    { min: 40, max: 54, name: "Pre-Intermediate", code: "BA-3PRE" },
+    { min: 55, max: 69, name: "Intermediate", code: "37700121" },
+    { min: 70, max: 79, name: "Upper Intermediate English", code: "B2-BA" },
+    { min: 80, max: 89, name: "Advanced English", code: "C1-BA" },
+    { min: 90, max: 100, name: "Proficiency (English)", code: "C2-BA" }
+  ]
+};
 
-  const studentId = document.getElementById("studentId").value;
+function getLevel(score, degree) {
+  const arr = levels[degree] || [];
+  for (let i = 0; i < arr.length; i++) {
+    if (score >= arr[i].min && score <= arr[i].max) return arr[i];
+  }
+  return { name: "", code: "" };
+}
+
+function getExemptedSubjects(score, degree) {
+  const arr = levels[degree] || [];
+  return arr
+    .filter(l => l.max < score)
+    .map(l => `${l.name} (${l.code})`)
+    .join(", ");
+}
+
+function submitResult() {
+  const studentId = document.getElementById("studentId").value.trim();
   const score = Number(document.getElementById("score").value);
   const degree = document.getElementById("degree").value;
 
-  if (!studentId || isNaN(score)) {
-    document.getElementById("status").innerText = "❌ يرجى إدخال جميع البيانات";
+  if (!studentId || isNaN(score) || score < 0 || score > 100) {
+    document.getElementById("status").innerText = "❌ الرجاء إدخال بيانات صحيحة";
     return;
   }
+
+  const level = getLevel(score, degree);
+  const exempted = getExemptedSubjects(score, degree);
 
   const data = {
     StudentID: studentId,
     Score: score,
     Degree: degree,
-    LevelName: "",
-    LevelCode: "",
-    ExemptedSubjects: ""
+    LevelName: level.name,
+    LevelCode: level.code,
+    ExemptedSubjects: exempted
   };
 
   fetch("https://defaulta162c5327a0c464596fd20d019cf4e.5a.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e92b89f4895c4f1591d02e0fc2a7e609/triggers/manual/paths/invoke?api-version=1", {
     method: "POST",
+    mode: "cors",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
   })
-  .then(res => {
-    if (!res.ok) throw new Error("Request failed");
-    return res.text();
-  })
+  .then(res => res.json())
   .then(() => {
     document.getElementById("status").innerText = "✅ تم حفظ النتيجة في SharePoint";
   })
-  .catch(() => {
+  .catch(err => {
+    console.error(err);
     document.getElementById("status").innerText = "❌ خطأ أثناء الإرسال";
   });
 }
@@ -70,5 +117,3 @@ function submitResult() {
 
 </body>
 </html>
-
-
