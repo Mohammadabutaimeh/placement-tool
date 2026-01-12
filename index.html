@@ -23,7 +23,50 @@
   <option>Bachelor Degree</option>
 </select><br><br>
 
-<button onclick="alert('الصفحة شغالة 👍')">اختبار</button>
+<button onclick="submitResult()">حفظ النتيجة</button>
+
+<p id="status"></p>
+
+<script>
+function submitResult() {
+
+  const studentId = document.getElementById("studentId").value;
+  const score = Number(document.getElementById("score").value);
+  const degree = document.getElementById("degree").value;
+
+  if (!studentId || isNaN(score)) {
+    document.getElementById("status").innerText = "❌ يرجى إدخال جميع البيانات";
+    return;
+  }
+
+  const data = {
+    StudentID: studentId,
+    Score: score,
+    Degree: degree,
+    LevelName: "",
+    LevelCode: "",
+    ExemptedSubjects: ""
+  };
+
+  fetch("PUT_YOUR_FLOW_URL_HERE", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Request failed");
+    return res.text();
+  })
+  .then(() => {
+    document.getElementById("status").innerText = "✅ تم حفظ النتيجة في SharePoint";
+  })
+  .catch(() => {
+    document.getElementById("status").innerText = "❌ خطأ أثناء الإرسال";
+  });
+}
+</script>
 
 </body>
 </html>
